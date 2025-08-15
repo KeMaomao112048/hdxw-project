@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>华大新闻</title>
+</head>
+<body>
+    <h1>华大新闻</h1>
+    <ul>
+        {% for news in news_list %}
+        <li><a href="{{ news.link }}" target="_blank">{{ news.title }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+</html>
