@@ -57,6 +57,9 @@ def insert_news(news_items, crawl_time):
         # 准备数据
         data = [(item['title'], item['link'], crawl_time) for item in news_items]
         
+        cursor.execute("TRUNCATE TABLE hqu_news")
+        db.commit()
+
         # 执行批量插入
         cursor.executemany(insert_sql, data)
         db.commit()

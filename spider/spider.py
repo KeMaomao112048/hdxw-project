@@ -48,3 +48,4 @@ if __name__ == '__main__':
         crawl_news()
         # 等待指定的时间间隔
         time.sleep(CRAWL_INTERVAL)
+   

@@ -8,11 +8,15 @@ app = Flask(__name__)
 @app.route('/hdxw')
 def hdxw():
     db = get_connection()
-    cursor = db.cursor()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT title,link FROM hqu_news ORDER BY crawl_time DESC")
+    news_list=cursor.fetchall()
+
+    cursor.execute("SELECT crawl_time FROM hqu_news ORDER BY crawl_time ASC limit 1")
+    last_update_time = cursor.fetchone()
+    cursor.close()
     db.close()
-    news = cursor.execute("SELECT title,link FROM hdxw").fetchall()
-    last_update_time = cursor.execute("SELECT crawl_time FROM hdxw ORDER BY crawl_time DESC").fetchone()
-    news_list = [dict(row) for row in news]
+
     return render_template('news.html', news_list=news_list, last_update_time= last_update_time)
 
 if __name__ == '__main__':
