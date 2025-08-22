@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  image: mysql:8.0
+  volumes:
+    - mysql_data:/var/lib/mysql
+  restart: always
+  networks:
+    - hdxw-network
+
+    
+  # 爬虫服务
+  spider:
+    build: ./spider
+    restart: always
+    networks:
+      - hdxw-network
+    depends_on:
+    - mysql
+
+  # Flask应用服务
+  flask_app:
+    build: ./flask
+    restart: always
+    networks:
+      - hdxw-network
+    expose:
+      - 5000
+    depends_on:
+      - spider
+
+  # Nginx服务
+  nginx:
+    build: ./nginx
+    volumes:
+      - ./static_site:/usr/share/nginx/html
+    ports:
+      - "80:80"
+    restart: always
+    networks:
+      - hdxw-network
+    depends_on:
+      - flask_app
+
+networks:
+  hdxw-network:
+    driver: bridge
+
+# 数据卷，用于持久化存储新闻数据库
+volumes:
+  mysql_data:

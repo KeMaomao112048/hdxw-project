@@ -5,6 +5,7 @@
 </head>
 <body>
     <h1>华大新闻</h1>
+    <p>上一次更新时间：{{ last_update_time }}</p>
     <ul>
         {% for news in news_list %}
         <li><a href="{{ news.link }}" target="_blank">{{ news.title }}</a></li>
