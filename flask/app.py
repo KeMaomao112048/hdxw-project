@@ -17,7 +17,7 @@ def hdxw():
     cursor.close()
     db.close()
 
-    return render_template('news.html', news_list=news_list, last_update_time= last_update_time)
+    return render_template('news.html', news_list=news_list, last_update_time= last_update_time['crawl_time'])
 
 if __name__ == '__main__':
     
