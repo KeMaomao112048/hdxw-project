@@ -4,7 +4,7 @@ FROM nginx:latest
 COPY nginx.conf /etc/nginx/conf.d/hdxw.conf
 
 # 复制静态文件
-COPY static/ /usr/share/nginx/html/
+COPY static-site/* /usr/share/nginx/html/
 
 EXPOSE 80
 
