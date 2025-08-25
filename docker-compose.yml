@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mysql:
     image: mysql:8.0
@@ -36,8 +34,6 @@ services:
   # Nginx服务
   nginx:
     build: ./nginx
-    volumes:
-      - ./nginx_data:/usr/share/nginx/html
     ports:
       - "80:80"
     restart: always
@@ -53,4 +49,3 @@ networks:
 # 数据卷，用于持久化存储新闻数据库
 volumes:
   mysql_data:
-  nginx_data:
