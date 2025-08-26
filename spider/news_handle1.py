@@ -1,7 +1,8 @@
 import mysql.connector
 from mysql.connector import Error
 
-def get_connection():
+
+def connect_db():
     db = None
     try:
         db = mysql.connector.connect(
@@ -15,37 +16,32 @@ def get_connection():
             return db
     except Error as e:
         print(f"数据库连接错误: {e}")
-        return None
+        return 
 
-def create_tables():
-    db = get_connection()
+
+def create_table(db):
     if db:
         try:
             cursor = db.cursor()
-            #cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_CONFIG['database']}")
-            #cursor.execute(f"USE {DB_CONFIG['database']}")
             sql = """
             CREATE TABLE IF NOT EXISTS hqu_news (
                 id INT AUTO_INCREMENT PRIMARY KEY,  
-                        title VARCHAR(255) NOT NULL,
-                        link VARCHAR(255)  NOT NULL,
-                        crawl_time DATETIME NOT NULL,
-                        UNIQUE (title, link)
-                    )
-                    """
+                title VARCHAR(255) NOT NULL,
+                link VARCHAR(255)  NOT NULL,
+                crawl_time DATETIME NOT NULL,
+                UNIQUE (title, link)
+                )
+                """
             cursor.execute(sql)
             db.commit()
             print("新闻表创建成功或已存在")
         except Error as e:
             print(f"创建表时出错: {e}")
         finally:
-            if db.is_connected():
                 cursor.close()
-                db.close()
        
 
-def insert_news(news_items, crawl_time):
-    db = get_connection()
+def insert_newsinfo(db, news_list, spider_time):
     try:
         cursor = db.cursor()
         # 使用INSERT IGNORE避免重复插入
@@ -55,7 +51,7 @@ def insert_news(news_items, crawl_time):
         """
         
         # 准备数据
-        data = [(item['title'], item['link'], crawl_time) for item in news_items]
+        data = [(item['title'], item['link'], spider_time) for item in news_list]
         
         cursor.execute("TRUNCATE TABLE hqu_news")
         db.commit()
@@ -68,30 +64,28 @@ def insert_news(news_items, crawl_time):
         print(f"插入数据时出错: {e}")
         db.rollback()
     finally:
-        if db.is_connected():
             cursor.close()
             db.close()
 
 
-def get_news(db):
+def get_newsinfo(db):
     if db:
         try:
-            cursor = db.cursor()
-            sql = """
-                SELECT title, link, crawl_time 
-                FROM hqu_news 
-                ORDER BY crawl_time DESC, id DESC 
-                LIMIT 100
-            """
-            cursor.execute(sql)
-            news = cursor.fetchall()
-            return news
+            # 获取所有新闻
+            cursor = db.cursor(dictionary=True)
+            cursor.execute("SELECT title,link FROM hqu_news ORDER BY crawl_time DESC")
+            news_list=cursor.fetchall()
+
+           # 获取最新更新时间
+            cursor.execute("SELECT crawl_time FROM hqu_news ORDER BY crawl_time ASC limit 1")
+            latest_update_time = cursor.fetchone()
+            print(f"获取到{len(news_list)}条新闻")
+
+            return news_list, latest_update_time
         except Error as e:
-            print(f"查询数据时出错: {e}")
-            return []
+            print(f"获取新闻失败:{e}")
+            return [], None
         finally:
-            if db.is_connected():
-                cursor.close()
-                db.close()
-    return []
-        
+            cursor.close()
+            db.close()
+
